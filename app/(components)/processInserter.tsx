@@ -7,6 +7,53 @@ import { timeQuantumState } from "../(recoil)/store";
 import { processesState } from "../(recoil)/store";
 import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
 import { motion } from "framer-motion";
+import { Sparkles } from "lucide-react";
+
+// Sample test cases for each algorithm
+const sampleTestCases: Record<string, any[]> = {
+  fcfs: [
+    { arrival_time: 0, burst_time: 5 },
+    { arrival_time: 1, burst_time: 3 },
+    { arrival_time: 2, burst_time: 8 },
+    { arrival_time: 3, burst_time: 6 },
+    { arrival_time: 4, burst_time: 4 }
+  ],
+  sjf_non_preemptive: [
+    { arrival_time: 0, burst_time: 7 },
+    { arrival_time: 2, burst_time: 4 },
+    { arrival_time: 4, burst_time: 1 },
+    { arrival_time: 5, burst_time: 4 },
+    { arrival_time: 7, burst_time: 3 }
+  ],
+  sjf_preemptive: [
+    { arrival_time: 0, burst_time: 8 },
+    { arrival_time: 1, burst_time: 4 },
+    { arrival_time: 2, burst_time: 9 },
+    { arrival_time: 3, burst_time: 5 },
+    { arrival_time: 4, burst_time: 2 }
+  ],
+  priority_non_preemptive: [
+    { arrival_time: 0, burst_time: 4, priority: 2 },
+    { arrival_time: 1, burst_time: 3, priority: 1 },
+    { arrival_time: 2, burst_time: 5, priority: 4 },
+    { arrival_time: 3, burst_time: 2, priority: 3 },
+    { arrival_time: 4, burst_time: 6, priority: 5 }
+  ],
+  priority_preemptive: [
+    { arrival_time: 0, burst_time: 6, priority: 3 },
+    { arrival_time: 1, burst_time: 4, priority: 1 },
+    { arrival_time: 2, burst_time: 2, priority: 2 },
+    { arrival_time: 3, burst_time: 5, priority: 4 },
+    { arrival_time: 4, burst_time: 3, priority: 5 }
+  ],
+  round_robin: [
+    { arrival_time: 0, burst_time: 10 },
+    { arrival_time: 1, burst_time: 5 },
+    { arrival_time: 2, burst_time: 8 },
+    { arrival_time: 3, burst_time: 6 },
+    { arrival_time: 4, burst_time: 3 }
+  ]
+};
 
 function ProcessInserter() {
   const algorithm = useRecoilValue(algorithmState);
@@ -16,6 +63,23 @@ function ProcessInserter() {
   const [arrivalTime, setArrivalTime] = useState(-1);
   const [burstTime, setBurstTime] = useState(-1);
   const [priority, setPriority] = useState(-1);
+
+  const handleLoadSample = () => {
+    if (!algorithm) {
+      alert("Please select an algorithm first");
+      return;
+    }
+    
+    const sampleData = sampleTestCases[algorithm];
+    if (sampleData) {
+      setProccesses(sampleData);
+      
+      // Set default time quantum for Round Robin
+      if (algorithm === "round_robin" && timeQuantum === 0) {
+        setTimeQuantum(2);
+      }
+    }
+  };
 
   const handleAddProcess = () => {
     if (!algorithm) {
@@ -66,6 +130,21 @@ function ProcessInserter() {
 
   return (
     <div>
+      {/* Load Sample Button */}
+      <div className="pl-5 pt-5">
+        <Button 
+          onClick={handleLoadSample}
+          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold shadow-lg transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
+          disabled={!algorithm}
+        >
+          <Sparkles size={18} />
+          Load Sample Test Case (5 Processes)
+        </Button>
+        {!algorithm && (
+          <p className="text-xs text-gray-500 mt-1 text-center">Select an algorithm first</p>
+        )}
+      </div>
+
       <div className="process_inserter_container pl-5 pt-5">
         <div className="arrival_burst_time_container">
           <div>
