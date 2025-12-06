@@ -18,12 +18,17 @@ function createWindow() {
   });
 
   // Load the app
-  const startUrl = process.env.ELECTRON_START_URL || `file://${path.join(__dirname, '../out/index.html')}`;
-  mainWindow.loadURL(startUrl);
-
-  // Open DevTools in development
-  if (process.env.ELECTRON_START_URL) {
-    mainWindow.webContents.openDevTools();
+  const isDev = !!process.env.ELECTRON_START_URL;
+  
+  if (isDev) {
+    // Try port 3000 first, then 3001 if it fails
+    mainWindow.loadURL('http://localhost:3000').catch(() => {
+      console.log('Port 3000 failed, trying 3001...');
+      mainWindow.loadURL('http://localhost:3001');
+    });
+    // DevTools removed - app opens without console
+  } else {
+    mainWindow.loadFile(path.join(__dirname, '../out/index.html'));
   }
 
   mainWindow.on('closed', () => {

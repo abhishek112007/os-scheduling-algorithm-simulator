@@ -65,38 +65,39 @@ export default function ProcessQueueVisualizer() {
       setCurrentTime((prevTime) => {
         const nextTime = prevTime + 1;
         
-        // Update process states based on Gantt chart
-        const newStates = [...processStates];
-        
         // Find which process is running at current time
         let runningPid = -1;
-        let cumulativeTime = ganttChartProcesses[0]?.time || 0;
-        
-        for (let i = 0; i < ganttChartProcesses.length; i++) {
-          const nextTime = ganttChartProcesses[i + 1]?.time || Infinity;
-          if (prevTime >= cumulativeTime && prevTime < nextTime) {
+        for (let i = 0; i < ganttChartProcesses.length - 1; i++) {
+          const startTime = ganttChartProcesses[i].time;
+          const endTime = ganttChartProcesses[i + 1].time;
+          if (nextTime > startTime && nextTime <= endTime) {
             runningPid = ganttChartProcesses[i].pid;
             break;
           }
-          cumulativeTime = nextTime;
         }
 
-        // Update all process states
-        newStates.forEach((ps) => {
-          // Check if process has completed
-          const hasCompleted = ganttChartProcesses.some((gp, idx) => {
-            const endTime = ganttChartProcesses[idx + 1]?.time;
-            return gp.pid === ps.pid && endTime && endTime <= prevTime;
-          });
+        // Update process states
+        const newStates = inputProcesses.map((proc, index) => {
+          const arrivalTime = proc.arrival_time || 0;
+          
+          // Find last time this process ran
+          let lastRunTime = -1;
+          for (let i = ganttChartProcesses.length - 1; i >= 0; i--) {
+            if (ganttChartProcesses[i].pid === index) {
+              lastRunTime = ganttChartProcesses[i + 1]?.time || ganttChartProcesses[ganttChartProcesses.length - 1].time;
+              break;
+            }
+          }
 
-          if (hasCompleted && ps.state !== "completed") {
-            ps.state = "completed";
-          } else if (ps.pid === runningPid) {
-            ps.state = "running";
-          } else if (!hasCompleted && ps.pid !== runningPid) {
-            // Check if process has arrived
-            const arrivalTime = inputProcesses[ps.pid]?.arrival_time || 0;
-            ps.state = prevTime >= arrivalTime ? "ready" : "waiting";
+          // Determine state
+          if (lastRunTime !== -1 && nextTime >= lastRunTime) {
+            return { pid: index, state: "completed" as const };
+          } else if (index === runningPid) {
+            return { pid: index, state: "running" as const };
+          } else if (nextTime >= arrivalTime) {
+            return { pid: index, state: "ready" as const };
+          } else {
+            return { pid: index, state: "waiting" as const };
           }
         });
 
@@ -114,7 +115,7 @@ export default function ProcessQueueVisualizer() {
     }, speed);
 
     return () => clearInterval(timer);
-  }, [isPlaying, speed, ganttChartProcesses, inputProcesses, processStates, currentTime]);
+  }, [isPlaying, speed, ganttChartProcesses, inputProcesses]);
 
   if (ganttChartProcesses.length === 0) {
     return null;

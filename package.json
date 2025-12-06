@@ -10,8 +10,8 @@
     "export": "next build && next export",
     "start": "next start",
     "lint": "next lint",
-    "electron": "wait-on http://localhost:3000 && electron .",
-    "electron-dev": "concurrently \"npm run dev\" \"npm run electron\"",
+    "electron": "cross-env ELECTRON_START_URL=1 electron .",
+    "electron-dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && npm run electron\"",
     "electron-build": "npm run export && electron-builder",
     "electron-build-win": "npm run export && electron-builder --win",
     "electron-build-mac": "npm run export && electron-builder --mac",
@@ -65,15 +65,22 @@
       "public/**/*"
     ],
     "win": {
-      "target": ["nsis"],
+      "target": [
+        "nsis"
+      ],
       "icon": "public/favicon.ico"
     },
     "mac": {
-      "target": ["dmg"],
+      "target": [
+        "dmg"
+      ],
       "icon": "public/favicon.icns"
     },
     "linux": {
-      "target": ["AppImage", "deb"],
+      "target": [
+        "AppImage",
+        "deb"
+      ],
       "icon": "public/favicon.png",
       "category": "Education"
     }
