@@ -9,7 +9,7 @@ type Process = {
 };
 
 export default function GanttChart() {
-  const ganntChartProcesses = useRecoilValue(ganntChart_processState);
+  const ganntChartProcesses = useRecoilValue(ganntChart_processState) as Process[];
   const ganntChartStartTime = useRecoilValue(ganntChart_startTimeState);
 
   // Beautiful color palette for processes
