@@ -16,6 +16,7 @@ type outputProcess = {
     waiting_time: number,
     turnaround_time: number,
     completion_time: number,
+    response_time: number
 } | {
     process_id: number,
     arrival_time: number,
@@ -23,6 +24,7 @@ type outputProcess = {
     waiting_time: number,
     turnaround_time: number,
     completion_time: number,
+    response_time: number,
     priority: number
 }
 
@@ -70,6 +72,11 @@ export const average_turnaround_time = atom({
 
 export const average_waiting_time = atom({
     key: "average_waiting_timeState",
+    default: 0
+})
+
+export const average_response_time = atom({
+    key: "average_response_timeState",
     default: 0
 })
 

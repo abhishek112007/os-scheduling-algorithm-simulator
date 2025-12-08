@@ -16,6 +16,7 @@ import { ganntChart_processState } from "../(recoil)/store";
 import { ganntChart_startTimeState } from "../(recoil)/store";
 import { average_turnaround_time } from "../(recoil)/store";
 import { average_waiting_time } from "../(recoil)/store";
+import { average_response_time } from "../(recoil)/store";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import axios from "axios";
 import LineChart from "../(components)/lineChart";
@@ -42,6 +43,7 @@ export default function Algorithm() {
   );
   const setAverageTurnaroundTime = useSetRecoilState(average_turnaround_time);
   const setAverageWaitingTime = useSetRecoilState(average_waiting_time);
+  const setAverageResponseTime = useSetRecoilState(average_response_time);
   const setLineChartState = useSetRecoilState(lineChartState);
   const setProcesses = useSetRecoilState(processesState);
   const setTimeQuantum = useSetRecoilState(timeQuantumState);
@@ -58,6 +60,7 @@ export default function Algorithm() {
     setOutputGanntChartStartTime([]);
     setAverageTurnaroundTime(0);
     setAverageWaitingTime(0);
+    setAverageResponseTime(0);
     setLineChartState([]);
     setError(null);
   };
@@ -131,6 +134,7 @@ export default function Algorithm() {
           response.data.output.average_turnaround_time
         );
         setAverageWaitingTime(response.data.output.average_waiting_time);
+        setAverageResponseTime(response.data.output.average_response_time);
         
         // Automatically trigger comparison after running the algorithm
         await handleComparison();

@@ -8,6 +8,7 @@ class Process {
         this.completion_time = 0;
         this.turnaround_time = 0;
         this.waiting_time = 0;
+        this.response_time = 0;
     }
 
     set_completion_time(completion_time) {
@@ -22,6 +23,10 @@ class Process {
         this.waiting_time = waiting_time;
     }
 
+    set_response_time(response_time) {
+        this.response_time = response_time;
+    }
+
     get_completion_time() {
         return this.completion_time;
     }
@@ -32,6 +37,10 @@ class Process {
 
     get_waiting_time() {
         return this.waiting_time;
+    }
+
+    get_response_time() {
+        return this.response_time;
     }
 }
 
@@ -59,7 +68,8 @@ function outputAsJSON(processes) {
         output += `"priority":${processes[i].priority},`;
         output += `"completion_time":${processes[i].completion_time},`;
         output += `"turnaround_time":${processes[i].turnaround_time},`;
-        output += `"waiting_time":${processes[i].waiting_time}`;
+        output += `"waiting_time":${processes[i].waiting_time},`;
+        output += `"response_time":${processes[i].response_time}`;
         output += "}";
 
         if (i < n - 1) output += ",";
@@ -101,9 +111,11 @@ export function priority_non_preemptive(processes_array) {
         completion_time += burst_time;
         let turnaround_time = completion_time - arrival_time;
         let waiting_time = turnaround_time - burst_time;
+        let response_time = waiting_time; // For non-preemptive, response time equals waiting time
         processes[index].set_completion_time(completion_time);
         processes[index].set_turnaround_time(turnaround_time);
         processes[index].set_waiting_time(waiting_time);
+        processes[index].set_response_time(response_time);
         processes[index].remaining_time = 0;
         remaining--;
 
@@ -143,16 +155,19 @@ export function priority_non_preemptive(processes_array) {
         index = min_index;
     }
 
-    // Computing the average turnaround_time and waiting_time
+    // Computing the average turnaround_time, waiting_time, and response_time
     let total_turnaround_time = 0;
     let total_waiting_time = 0;
+    let total_response_time = 0;
     for (let i = 0; i < n; ++i) {
         total_turnaround_time += processes[i].turnaround_time;
         total_waiting_time += processes[i].waiting_time;
+        total_response_time += processes[i].response_time;
     }
 
     const average_turnaround_time = (total_turnaround_time / n).toFixed(2);
     const average_waiting_time = (total_waiting_time / n).toFixed(2);
+    const average_response_time = (total_response_time / n).toFixed(2);
 
     const process_output = outputAsJSON(processes);
     
@@ -161,6 +176,7 @@ export function priority_non_preemptive(processes_array) {
         ganntChart_startTime,
         average_turnaround_time,
         average_waiting_time,
+        average_response_time,
         process_output
     }
 }

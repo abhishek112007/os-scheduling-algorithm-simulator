@@ -7,6 +7,7 @@ class Process {
         this.completion_time = 0;
         this.turnaround_time = 0;
         this.waiting_time = 0;
+        this.response_time = 0;
     }
 
     setCompletionTime(completion_time) {
@@ -21,6 +22,10 @@ class Process {
         this.waiting_time = waiting_time;
     }
 
+    setResponseTime(response_time) {
+        this.response_time = response_time;
+    }
+
     getCompletionTime() {
         return this.completion_time;
     }
@@ -31,6 +36,10 @@ class Process {
 
     getWaitingTime() {
         return this.waiting_time;
+    }
+
+    getResponseTime() {
+        return this.response_time;
     }
 }
 
@@ -53,7 +62,8 @@ function outputAsJSON(processes) {
         output += `"burst_time":${processes[i].burst_time},`;
         output += `"completion_time":${processes[i].completion_time},`;
         output += `"turnaround_time":${processes[i].turnaround_time},`;
-        output += `"waiting_time":${processes[i].waiting_time}`;
+        output += `"waiting_time":${processes[i].waiting_time},`;
+        output += `"response_time":${processes[i].response_time}`;
         output += "}";
 
         if (i < n - 1) output += ",";
@@ -81,6 +91,7 @@ export function round_robin(processes_array,time_quantum) {
     let time = processes[0].arrival_time;
     let j = 1;
     const q = [];
+    const first_response_time = new Array(n).fill(-1);
     q.push(0);
     let initial_time = time;
     const ganntChart_startTime = initial_time;
@@ -88,6 +99,11 @@ export function round_robin(processes_array,time_quantum) {
     while (q.length > 0) {
         const idx = q.shift();
         const curr = processes[idx];
+
+        // Track first response time
+        if (first_response_time[idx] === -1) {
+            first_response_time[idx] = time;
+        }
 
         if (curr.remaining_time > time_quantum) {
             time += time_quantum;
@@ -127,15 +143,23 @@ export function round_robin(processes_array,time_quantum) {
         time = new_time;
     }
 
+    // Set response_time for each process
+    for (let i = 0; i < n; ++i) {
+        processes[i].setResponseTime(first_response_time[i] - processes[i].arrival_time);
+    }
+
     let total_turnaround_time = 0;
     let total_waiting_time = 0;
+    let total_response_time = 0;
     for (let i = 0; i < n; ++i) {
         total_turnaround_time += processes[i].getTurnaroundTime();
         total_waiting_time += processes[i].getWaitingTime();
+        total_response_time += processes[i].getResponseTime();
     }
 
     const average_turnaround_time = (total_turnaround_time / n).toFixed(2);
     const average_waiting_time = (total_waiting_time / n).toFixed(2);
+    const average_response_time = (total_response_time / n).toFixed(2);
 
     const process_output = outputAsJSON(processes);
     
@@ -144,6 +168,7 @@ export function round_robin(processes_array,time_quantum) {
         ganntChart_startTime,
         average_turnaround_time,
         average_waiting_time,
+        average_response_time,
         process_output
     }
 }

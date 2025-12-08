@@ -4,6 +4,7 @@ import { currAlgorithmState } from "../(recoil)/store";
 import { outputProcessesState } from "../(recoil)/store";
 import { average_waiting_time } from "../(recoil)/store";
 import { average_turnaround_time } from "../(recoil)/store";
+import { average_response_time } from "../(recoil)/store";
 import { useRecoilValue } from "recoil";
 import {
   Table,
@@ -20,6 +21,7 @@ function OutputProcessTable() {
   const processes = useRecoilValue(outputProcessesState);
   const averageTurnaroundTime = useRecoilValue(average_turnaround_time);
   const averageWaitingTime = useRecoilValue(average_waiting_time);
+  const averageResponseTime = useRecoilValue(average_response_time);
 
   if (processes.length === 0) {
     return (
@@ -56,6 +58,7 @@ function OutputProcessTable() {
               <TableHead className="text-white font-bold">Completion Time</TableHead>
               <TableHead className="text-white font-bold">Turnaround Time</TableHead>
               <TableHead className="text-white font-bold">Waiting Time</TableHead>
+              <TableHead className="text-white font-bold">Response Time</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -75,13 +78,14 @@ function OutputProcessTable() {
                 <TableCell className="font-semibold">{process.completion_time}</TableCell>
                 <TableCell className="font-semibold text-blue-600">{process.turnaround_time}</TableCell>
                 <TableCell className="font-semibold text-green-600">{process.waiting_time}</TableCell>
+                <TableCell className="font-semibold text-orange-600">{process.response_time}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
       
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-xl shadow-lg text-white transform hover:scale-105 transition-transform duration-300">
           <div className="flex items-center justify-between">
             <div>
@@ -101,6 +105,17 @@ function OutputProcessTable() {
               <p className="text-xs opacity-80 mt-1">time units</p>
             </div>
             <div className="text-6xl opacity-20">⏳</div>
+          </div>
+        </div>
+        
+        <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-6 rounded-xl shadow-lg text-white transform hover:scale-105 transition-transform duration-300">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm opacity-90 uppercase tracking-wide mb-1">Average Response Time</p>
+              <p className="text-4xl font-bold">{Number(averageResponseTime).toFixed(2)}</p>
+              <p className="text-xs opacity-80 mt-1">time units</p>
+            </div>
+            <div className="text-6xl opacity-20">⚡</div>
           </div>
         </div>
       </div>

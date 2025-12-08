@@ -6,6 +6,7 @@ class Process {
         this.completion_time = 0;
         this.turnaround_time = 0;
         this.waiting_time = 0;
+        this.response_time = 0;
     }
 
     setCompletionTime(completion_time) {
@@ -20,6 +21,10 @@ class Process {
         this.waiting_time = waiting_time;
     }
 
+    setResponseTime(response_time) {
+        this.response_time = response_time;
+    }
+
     getCompletionTime() {
         return this.completion_time;
     }
@@ -30,6 +35,10 @@ class Process {
 
     getWaitingTime() {
         return this.waiting_time;
+    }
+
+    getResponseTime() {
+        return this.response_time;
     }
 }
 
@@ -52,7 +61,8 @@ function outputAsJSON(processes) {
         output += `"burst_time":${processes[i].burst_time},`;
         output += `"completion_time":${processes[i].completion_time},`;
         output += `"turnaround_time":${processes[i].turnaround_time},`;
-        output += `"waiting_time":${processes[i].waiting_time}`;
+        output += `"waiting_time":${processes[i].waiting_time},`;
+        output += `"response_time":${processes[i].response_time}`;
         output += "}";
 
         if (i < n - 1) output += ",";
@@ -91,6 +101,8 @@ export function fcfs(processes_array) {
             initial_time = completion_time;
         }
 
+        const response_time = initial_time - arrival_time;
+
         completion_time += burst_time;
         const turnaround_time = completion_time - arrival_time;
         const waiting_time = turnaround_time - burst_time;
@@ -98,20 +110,24 @@ export function fcfs(processes_array) {
         processes[i].setCompletionTime(completion_time);
         processes[i].setTurnaroundTime(turnaround_time);
         processes[i].setWaitingTime(waiting_time);
+        processes[i].setResponseTime(response_time);
 
         ganntChart_process.push({ pid : processes[i].process_id, time : completion_time});
     }
 
     let total_turnaround_time = 0;
     let total_waiting_time = 0;
+    let total_response_time = 0;
 
     for (let i = 0; i < n; ++i) {
         total_turnaround_time += processes[i].turnaround_time;
         total_waiting_time += processes[i].waiting_time;
+        total_response_time += processes[i].response_time;
     }
 
     const average_turnaround_time = (total_turnaround_time / n).toFixed(2);
     const average_waiting_time = (total_waiting_time / n).toFixed(2);
+    const average_response_time = (total_response_time / n).toFixed(2);
 
     const process_output = outputAsJSON(processes);
     
@@ -120,6 +136,7 @@ export function fcfs(processes_array) {
         ganntChart_startTime,
         average_turnaround_time,
         average_waiting_time,
+        average_response_time,
         process_output
     }
 }

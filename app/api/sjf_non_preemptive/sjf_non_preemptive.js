@@ -6,6 +6,7 @@ class Process {
         this.completion_time = 0;
         this.turnaround_time = 0;
         this.waiting_time = 0;
+        this.response_time = 0;
     }
 
     setCompletionTime(completion_time) {
@@ -20,6 +21,10 @@ class Process {
         this.waiting_time = waiting_time;
     }
 
+    setResponseTime(response_time) {
+        this.response_time = response_time;
+    }
+
     getCompletionTime() {
         return this.completion_time;
     }
@@ -30,6 +35,10 @@ class Process {
 
     getWaitingTime() {
         return this.waiting_time;
+    }
+
+    getResponseTime() {
+        return this.response_time;
     }
 }
 
@@ -52,7 +61,8 @@ function outputAsJSON(processes) {
         output += `"burst_time":${processes[i].burst_time},`;
         output += `"completion_time":${processes[i].completion_time},`;
         output += `"turnaround_time":${processes[i].turnaround_time},`;
-        output += `"waiting_time":${processes[i].waiting_time}`;
+        output += `"waiting_time":${processes[i].waiting_time},`;
+        output += `"response_time":${processes[i].response_time}`;
         output += "}";
 
         if (i < n - 1) output += ",";
@@ -150,9 +160,11 @@ export function sjf_non_preemptive(processes_array) {
         completion_time += burst_time;
         const turnaround_time = completion_time - arrival_time;
         const waiting_time = turnaround_time - burst_time;
+        const response_time = waiting_time; // For non-preemptive, response time equals waiting time
         processes[curr].setCompletionTime(completion_time);
         processes[curr].setTurnaroundTime(turnaround_time);
         processes[curr].setWaitingTime(waiting_time);
+        processes[curr].setResponseTime(response_time);
 
         ganntChart_process.push({ pid: processes[curr].process_id, time: completion_time });
 
@@ -170,13 +182,16 @@ export function sjf_non_preemptive(processes_array) {
 
     let total_turnaround_time = 0;
     let total_waiting_time = 0;
+    let total_response_time = 0;
     for (let i = 0; i < n; ++i) {
         total_turnaround_time += processes[i].getTurnaroundTime();
         total_waiting_time += processes[i].getWaitingTime();
+        total_response_time += processes[i].getResponseTime();
     }
 
     const average_turnaround_time = (total_turnaround_time / n).toFixed(2);
     const average_waiting_time = (total_waiting_time / n).toFixed(2);
+    const average_response_time = (total_response_time / n).toFixed(2);
 
     const process_output = outputAsJSON(processes);
 
@@ -185,6 +200,7 @@ export function sjf_non_preemptive(processes_array) {
         ganntChart_startTime,
         average_turnaround_time,
         average_waiting_time,
+        average_response_time,
         process_output
     };
 }
